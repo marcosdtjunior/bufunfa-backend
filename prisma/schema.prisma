@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id                Int        @id @default(autoincrement())
+  name              String
+  email             String     @unique
+  password          String
+  photo             String?
+  background        String?
+  type              String
+  ceos              ceo[]
+  employees         employee[]
+}
+
+model ceo {
+  user              user       @relation(fields: [userId], references: [id])
+  userId            Int
+  cpf               String     @unique
+  companies         company[]
+  @@id(userId)
+}
+
+model company {
+  id                Int        @id @default(autoincrement())
+  name              String
+  slogan            String?
+  description       String?
+  cnpj              String     @unique
+  logo              String?
+  salary            Int
+  ceo               ceo        @relation(fields: [ceoId], references: [userId])
+  ceoId             Int        @unique
+  employeeCompanies employeeCompany[]
+  tasks             task[]
+}
+
+model employee {
+  user              user       @relation(fields: [userId], references: [id])
+  userId            Int
+  balance           Int       
+  employeeTasks     employeeTask[]
+  employeeExpenses  employeeExpense[]
+  employeeCompanies employeeCompany[]
+  loans             loan[]
+  @@id(userId)
+}
+
+model employeeCompany {
+  employee          employee  @relation(fields: [employeeId], references: [userId])
+  employeeId        Int
+  company           company    @relation(fields: [companyId], references: [id])
+  companyId         Int
+  @@id([employeeId, companyId])
+}
+
+model task {
+  id                Int        @id @default(autoincrement())
+  title             String
+  description       String?
+  value             Int
+  company           company    @relation(fields: [companyId], references: [id])
+  companyId         Int        @unique
+  employeeTasks     employeeTask[]
+}
+
+model employeeTask {
+  employee          employee  @relation(fields: [employeeId], references: [userId])
+  employeeId        Int
+  task              task      @relation(fields: [taskId], references: [id])
+  taskId            Int
+  employeeStatus    String    //a_fazer, enviada ou feita
+  ceoStatus         String    //pendente, validar ou concluida
+  @@id([employeeId, taskId])
+}
+
+model expense {
+  id                Int        @id @default(autoincrement())
+  title             String
+  description       String?
+  value             Int
+  type              Boolean   //obrigatória -> true  opcional -> false
+  employeeExpenses  employeeExpense[]
+}
+
+model employeeExpense {
+  employee          employee  @relation(fields: [employeeId], references: [userId])
+  employeeId        Int
+  expense           expense   @relation(fields: [expenseId], references: [id])
+  expenseId         Int
+  status            Boolean   @default(false) //não-pago -> false  pago -> true
+  @@id([employeeId, expenseId])
+}
+
+model loan {
+  id                Int       @id @default(autoincrement())
+  description       String
+  value             Int
+  employee          employee  @relation(fields: [employeeId], references: [userId])
+  employeeId        Int
+  accepted          Boolean   @default(false)
+}
