@@ -39,7 +39,7 @@ model company {
   logo              String?
   salary            Int
   ceo               ceo        @relation(fields: [ceoId], references: [userId])
-  ceoId             Int        @unique
+  ceoId             Int        
   employeeCompanies employeeCompany[]
   tasks             task[]
 }
@@ -69,7 +69,7 @@ model task {
   description       String?
   value             Int
   company           company    @relation(fields: [companyId], references: [id])
-  companyId         Int        @unique
+  companyId         Int        
   employeeTasks     employeeTask[]
 }
 

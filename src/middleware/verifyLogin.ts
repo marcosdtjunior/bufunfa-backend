@@ -20,7 +20,7 @@ const verifyLogin = async (req: Request, res: Response, next: NextFunction) => {
     const { authorization } = req.headers;
 
     if (!authorization) {
-        return res.status(404).json({ mensagem: 'Não autorizado' });
+        return res.status(401).json({ mensagem: 'Não autorizado' });
     }
 
     try {
@@ -35,7 +35,7 @@ const verifyLogin = async (req: Request, res: Response, next: NextFunction) => {
         const userFound = await findUnique('user', { id });
 
         if (!userFound) {
-            return res.status(404).json({ mensagem: 'Não autorizado' });
+            return res.status(401).json({ mensagem: 'Não autorizado' });
         }
 
         const { password: _, ...loggedUser } = userFound;

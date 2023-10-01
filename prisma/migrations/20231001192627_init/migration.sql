@@ -110,12 +110,6 @@ CREATE UNIQUE INDEX "ceo_cpf_key" ON "ceo"("cpf");
 -- CreateIndex
 CREATE UNIQUE INDEX "company_cnpj_key" ON "company"("cnpj");
 
--- CreateIndex
-CREATE UNIQUE INDEX "company_ceoId_key" ON "company"("ceoId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "task_companyId_key" ON "task"("companyId");
-
 -- AddForeignKey
 ALTER TABLE "ceo" ADD CONSTRAINT "ceo_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

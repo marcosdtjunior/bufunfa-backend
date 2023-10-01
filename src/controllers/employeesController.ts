@@ -8,7 +8,7 @@ const applyForLoan = async (req: Request, res: Response) => {
 
     try {
         if (userType !== 'employee') {
-            return res.status(404).json({ mensagem: 'Você não pode executar esta funcionalidade' });
+            return res.status(401).json({ mensagem: 'Você não pode executar esta funcionalidade' });
         }
 
         const employee = await findUnique('user', { id: userId });

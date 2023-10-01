@@ -17,39 +17,39 @@ class includes {
 }
 
 /**
- * Encontra um único registro em uma tabela específica com base em uma condição fornecida.
+ * Encontra um registro único em uma tabela específica baseado na consulta por um id ou um atributo único.
+ * 
  * @param table O nome da tabela em que o registro será encontrado.
  * @param data Opcional. Os critérios de pesquisa para encontrar o registro, por exemplo pode ser usado id ou email.
  * @param includes Opcional. Os relacionamentos incluídos no resultado da consulta.
  * @returns O registro encontrado.
  */
 
-export async function findUnique(
-  table: string,
-  data?: any,
-  includes?: includes
-) {
+export async function findUnique(table: string, data?: any, includes?: includes) {
   const where = data;
-  const Infos = await prisma[table].findUnique({
+  const infos = await prisma[table].findUnique({
     where,
     include: includes ? includes : undefined,
   });
-  return Infos;
+  return infos;
 }
 
 /**
- * Função para buscar um único registro em uma tabela específica no banco de dados.
+ * Função para buscar vários registros em uma tabela específica com base em uma condição fornecida.
  *
  * @param table O nome da tabela do banco de dados na qual deseja buscar o registro.
+ * @param data Opcional. Os critérios de pesquisa para encontrar o registro.
  * @param includes (opcional) Um objeto com opções de inclusão de relacionamentos.
  * @returns Uma Promise que resolve para o registro encontrado.
  */
 
-export async function findMany(table: string, includes?: includes) {
-  const Infos = await prisma[table].findMany({
+export async function findMany(table: string, data?: any, includes?: includes) {
+  const where = data;
+  const infos = await prisma[table].findMany({
+    where,
     include: includes ? includes : undefined,
   });
-  return Infos;
+  return infos;
 }
 
 /**
@@ -89,9 +89,9 @@ export async function deleteOne(table: string, id: number) {
 
 export async function findFirst(table: string, data: any) {
 
-  const Infos = await prisma[table].findFirst({
+  const infos = await prisma[table].findFirst({
     where: data
   })
 
-  return Infos;
+  return infos;
 }

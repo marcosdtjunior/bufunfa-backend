@@ -52,12 +52,10 @@ const register = async (req: Request, res: Response) => {
 
         const userDataFound = await findUnique('user', { email });
 
-        const userId = userDataFound.id;
-
         if (userType === 'ceo') {
-            await createOrUpdate(userType, { userId, cpf });
+            await createOrUpdate(userType, { userId: userDataFound.id, cpf });
         } else {
-            await createOrUpdate(userType, { userId, balance: 0 });
+            await createOrUpdate(userType, { userId: userDataFound.id, balance: 0 });
         }
 
         return res.status(201).json({ mensagem: "Usuário criado com sucesso!" });
@@ -68,12 +66,17 @@ const register = async (req: Request, res: Response) => {
 
 const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
+    const { userType } = req.params;
 
     try {
         const userFound = await findUnique('user', { email });
 
         if (!userFound) {
             return res.status(404).json({ mensagem: 'Usuário e/ou senha inválido(s)' });
+        }
+
+        if (userFound.type !== userType) {
+            return res.status(401).json({ mensagem: 'Você não tem autorização para logar com este tipo de conta' });
         }
 
         const passwordVerified = await bcrypt.compare(password, userFound.password);
