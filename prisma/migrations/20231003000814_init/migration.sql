@@ -36,7 +36,6 @@ CREATE TABLE "company" (
 -- CreateTable
 CREATE TABLE "employee" (
     "userId" INTEGER NOT NULL,
-    "balance" INTEGER NOT NULL,
 
     CONSTRAINT "employee_pkey" PRIMARY KEY ("userId")
 );
@@ -45,6 +44,7 @@ CREATE TABLE "employee" (
 CREATE TABLE "employeeCompany" (
     "employeeId" INTEGER NOT NULL,
     "companyId" INTEGER NOT NULL,
+    "balance" INTEGER NOT NULL,
 
     CONSTRAINT "employeeCompany_pkey" PRIMARY KEY ("employeeId","companyId")
 );
@@ -64,8 +64,8 @@ CREATE TABLE "task" (
 CREATE TABLE "employeeTask" (
     "employeeId" INTEGER NOT NULL,
     "taskId" INTEGER NOT NULL,
-    "employeeStatus" TEXT NOT NULL,
-    "ceoStatus" TEXT NOT NULL,
+    "employeeStatus" TEXT NOT NULL DEFAULT 'a fazer',
+    "ceoStatus" TEXT NOT NULL DEFAULT 'pendente',
 
     CONSTRAINT "employeeTask_pkey" PRIMARY KEY ("employeeId","taskId")
 );
@@ -77,6 +77,7 @@ CREATE TABLE "expense" (
     "description" TEXT,
     "value" INTEGER NOT NULL,
     "type" BOOLEAN NOT NULL,
+    "companyId" INTEGER NOT NULL,
 
     CONSTRAINT "expense_pkey" PRIMARY KEY ("id")
 );
@@ -95,8 +96,8 @@ CREATE TABLE "loan" (
     "id" SERIAL NOT NULL,
     "description" TEXT NOT NULL,
     "value" INTEGER NOT NULL,
-    "employeeId" INTEGER NOT NULL,
     "accepted" BOOLEAN NOT NULL DEFAULT false,
+    "employeeId" INTEGER NOT NULL,
 
     CONSTRAINT "loan_pkey" PRIMARY KEY ("id")
 );
@@ -133,6 +134,9 @@ ALTER TABLE "employeeTask" ADD CONSTRAINT "employeeTask_employeeId_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "employeeTask" ADD CONSTRAINT "employeeTask_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "expense" ADD CONSTRAINT "expense_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "employeeExpense" ADD CONSTRAINT "employeeExpense_employeeId_fkey" FOREIGN KEY ("employeeId") REFERENCES "employee"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;

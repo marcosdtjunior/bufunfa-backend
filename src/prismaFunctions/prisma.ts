@@ -1,3 +1,5 @@
+import { number } from "zod";
+
 const { PrismaClient } = require("@prisma/client");
 
 export const prisma = new PrismaClient();
@@ -94,4 +96,12 @@ export async function findFirst(table: string, data: any) {
   })
 
   return infos;
+}
+
+export async function maxIndex(table: string) {
+  const index = await prisma[table].aggregate({
+    _max: { id: true }
+  });
+
+  return index._max.id;
 }

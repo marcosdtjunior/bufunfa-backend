@@ -42,12 +42,12 @@ model company {
   ceoId             Int        
   employeeCompanies employeeCompany[]
   tasks             task[]
+  expenses          expense[]
 }
 
 model employee {
   user              user       @relation(fields: [userId], references: [id])
-  userId            Int
-  balance           Int       
+  userId            Int       
   employeeTasks     employeeTask[]
   employeeExpenses  employeeExpense[]
   employeeCompanies employeeCompany[]
@@ -56,10 +56,11 @@ model employee {
 }
 
 model employeeCompany {
-  employee          employee  @relation(fields: [employeeId], references: [userId])
+  employee          employee   @relation(fields: [employeeId], references: [userId])
   employeeId        Int
   company           company    @relation(fields: [companyId], references: [id])
   companyId         Int
+  balance           Int
   @@id([employeeId, companyId])
 }
 
@@ -78,8 +79,8 @@ model employeeTask {
   employeeId        Int
   task              task      @relation(fields: [taskId], references: [id])
   taskId            Int
-  employeeStatus    String    //a_fazer, enviada ou feita
-  ceoStatus         String    //pendente, validar ou concluida
+  employeeStatus    String    @default("a fazer")      //a fazer, enviada ou feita
+  ceoStatus         String    @default("pendente")      //pendente, validar ou concluída
   @@id([employeeId, taskId])
 }
 
@@ -88,24 +89,26 @@ model expense {
   title             String
   description       String?
   value             Int
-  type              Boolean   //obrigatória -> true  opcional -> false
+  type              Boolean    //obrigatória -> true  opcional -> false
+  company           company    @relation(fields: [companyId], references: [id])
+  companyId         Int
   employeeExpenses  employeeExpense[]
 }
 
 model employeeExpense {
-  employee          employee  @relation(fields: [employeeId], references: [userId])
+  employee          employee   @relation(fields: [employeeId], references: [userId])
   employeeId        Int
-  expense           expense   @relation(fields: [expenseId], references: [id])
+  expense           expense    @relation(fields: [expenseId], references: [id])
   expenseId         Int
-  status            Boolean   @default(false) //não-pago -> false  pago -> true
+  status            Boolean    @default(false) //não-pago -> false  pago -> true
   @@id([employeeId, expenseId])
 }
 
 model loan {
-  id                Int       @id @default(autoincrement())
+  id                Int        @id @default(autoincrement())
   description       String
   value             Int
-  employee          employee  @relation(fields: [employeeId], references: [userId])
+  accepted          Boolean    @default(false)
+  employee          employee   @relation(fields: [employeeId], references: [userId])
   employeeId        Int
-  accepted          Boolean   @default(false)
 }

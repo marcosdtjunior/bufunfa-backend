@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { createOrUpdate, findUnique } from '../prismaFunctions/prisma';
-import { requiredCeoData, requiredEmployeeData } from '../utils/validations';
+import requiredData from '../utils/validations';
 
 const register = async (req: Request, res: Response) => {
     const { userType } = req.params;
@@ -13,24 +13,18 @@ const register = async (req: Request, res: Response) => {
         const { cpf, ...userData } = user;
         const { email } = user;
 
-        let validation;
+        if (userType === 'ceo') {
+            if (!cpf) {
+                return res.status(400).json({ mensagem: 'O CPF do CEO não foi informado' });
+            }
 
-        switch (userType) {
-            case 'ceo':
-                validation = requiredCeoData.safeParse(user);
-
-                const findCPF = await findUnique('ceo', { cpf });
-                if (findCPF) {
-                    return res.status(400).json({ mensagem: 'Já existe um CEO com o CPF cadastrado' });
-                }
-
-                break;
-            case 'employee':
-                validation = requiredEmployeeData.safeParse(user);
-                break;
-            default:
-                return res.status(400).json({ mensagem: 'Tipo de usuário inválido' });
+            const findCPF = await findUnique('ceo', { cpf });
+            if (findCPF) {
+                return res.status(400).json({ mensagem: 'Já existe um CEO com o CPF cadastrado' });
+            }
         }
+
+        const validation = requiredData.safeParse(userData);
 
         if (!validation.success) {
             return res.status(400).json({ mensagem: validation.error.issues[0].message });
@@ -55,7 +49,7 @@ const register = async (req: Request, res: Response) => {
         if (userType === 'ceo') {
             await createOrUpdate(userType, { userId: userDataFound.id, cpf });
         } else {
-            await createOrUpdate(userType, { userId: userDataFound.id, balance: 0 });
+            await createOrUpdate(userType, { userId: userDataFound.id });
         }
 
         return res.status(201).json({ mensagem: "Usuário criado com sucesso!" });

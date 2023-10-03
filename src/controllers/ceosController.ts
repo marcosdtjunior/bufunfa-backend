@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createOrUpdate, findFirst, findMany, findUnique } from '../prismaFunctions/prisma';
+import { createOrUpdate, findFirst, findMany, findUnique, maxIndex } from '../prismaFunctions/prisma';
 
 const createCompany = async (req: Request, res: Response) => {
     const data = req.body;
@@ -55,6 +55,8 @@ const createTask = async (req: Request, res: Response) => {
 
 const createExpense = async (req: Request, res: Response) => {
     const data = req.body;
+    const { companyId } = req.params;
+    const userId = req.user?.id;
     const userType = req.user?.type;
 
     try {
@@ -62,7 +64,30 @@ const createExpense = async (req: Request, res: Response) => {
             return res.status(401).json({ mensagem: 'Você não pode executar esta funcionalidade' });
         }
 
-        await createOrUpdate('expense', { ...data });
+        const companyFound = await findUnique('company', { id: Number(companyId) });
+
+        if (!companyFound) {
+            return res.status(404).json({ mensagem: 'Empresa não encontrada!' });
+        }
+
+        const ceo = await findUnique('user', { id: userId });
+        const companyCeo = await findFirst('company', { id: Number(companyId), ceoId: ceo.id });
+
+        if (!companyCeo) {
+            return res.status(401).json({ mensagem: 'O CEO logado não é CEO desta empresa!' });
+        }
+
+        await createOrUpdate('expense', { ...data, companyId: Number(companyId) });
+
+        const maxIdExpense = await maxIndex('expense');
+
+        const companyEmployees = await findMany('employeeCompany', { companyId: Number(companyId) });
+
+        if (companyEmployees) {
+            for (let registry of companyEmployees) {
+                await createOrUpdate('employeeExpense', { employeeId: registry.employeeId, expenseId: maxIdExpense });
+            }
+        }
 
         return res.status(201).json({ mensagem: 'Despesa criada com sucesso!' });
     } catch (error) {
@@ -106,9 +131,17 @@ const hireEmployee = async (req: Request, res: Response) => {
             return res.status(400).json({ mensagem: 'O funcionário já pertence a esta empresa!' });
         }
 
-        await createOrUpdate('employeeCompany', { employeeId: userFound.id, companyId: Number(companyId) });
+        await createOrUpdate('employeeCompany', { employeeId: userFound.id, companyId: Number(companyId), balance: 0 });
 
-        return res.status(201).json({ mensagem: 'Funcionário adicionado a empresa!' });
+        const expenses = await findMany('expense');
+
+        if (expenses) {
+            for (let registry of expenses) {
+                await createOrUpdate('employeeExpense', { employeeId: userFound.id, expenseId: registry.id });
+            }
+        }
+
+        return res.status(201).json({ mensagem: 'Funcionário contratado com sucesso!' });
     } catch (error) {
         return res.status(500).json(error);
     }
@@ -168,7 +201,7 @@ const getCompanyEmployees = async (req: Request, res: Response) => {
             employees.push({ id: query.id, name: query.name });
         }
 
-        return res.json(employees);
+        return res.status(200).json(employees);
 
     } catch (error) {
         return res.status(500).json(error);
