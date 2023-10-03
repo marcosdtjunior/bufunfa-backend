@@ -133,7 +133,7 @@ const hireEmployee = async (req: Request, res: Response) => {
 
         await createOrUpdate('employeeCompany', { employeeId: userFound.id, companyId: Number(companyId), balance: 0 });
 
-        const expenses = await findMany('expense');
+        const expenses = await findMany('expense', { companyId: Number(companyId) });
 
         if (expenses) {
             for (let registry of expenses) {
