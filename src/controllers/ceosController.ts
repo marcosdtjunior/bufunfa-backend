@@ -47,6 +47,16 @@ const createTask = async (req: Request, res: Response) => {
 
         await createOrUpdate('task', { ...data, companyId: Number(companyId) });
 
+        const maxIdTask = await maxIndex('task');
+
+        const companyEmployees = await findMany('employeeCompany', { companyId: Number(companyId) });
+
+        if (companyEmployees) {
+            for (let registry of companyEmployees) {
+                await createOrUpdate('employeeTask', { employeeId: registry.employeeId, taskId: maxIdTask });
+            }
+        }
+
         return res.status(201).json({ mensagem: 'Tarefa criada com sucesso!' });
     } catch (error) {
         return res.status(500).json(error);
@@ -132,6 +142,14 @@ const hireEmployee = async (req: Request, res: Response) => {
         }
 
         await createOrUpdate('employeeCompany', { employeeId: userFound.id, companyId: Number(companyId), balance: 0 });
+
+        const tasks = await findMany('task', { companyId: Number(companyId) });
+
+        if (tasks) {
+            for (let registry of tasks) {
+                await createOrUpdate('employeeTask', { employeeId: userFound.id, taskId: registry.id });
+            }
+        }
 
         const expenses = await findMany('expense', { companyId: Number(companyId) });
 
