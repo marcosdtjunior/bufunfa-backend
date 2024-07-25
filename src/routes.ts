@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register, login } from './controllers/usersController';
+import { register, login, getUserInfo } from './controllers/usersController';
 import { verifyLogin } from './middleware/verifyLogin';
 import { createCompany, createExpense, createTask, getCeoCompanies, getAllEmployees, hireEmployee, getCompanyEmployees } from './controllers/ceosController';
 import { applyForLoan, showMandatoryExpenses, showOptionalExpenses } from './controllers/employeesController';
@@ -10,6 +10,8 @@ router.post('/register/:userType', register);
 router.post('/login/:userType', login);
 
 router.use(verifyLogin);
+
+router.get('/userInfo', getUserInfo);
 
 //CEO routes
 router.post('/createCompany', createCompany);

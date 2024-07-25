@@ -3,6 +3,7 @@ CREATE TABLE "user" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "cpf" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "photo" TEXT,
     "background" TEXT,
@@ -14,7 +15,6 @@ CREATE TABLE "user" (
 -- CreateTable
 CREATE TABLE "ceo" (
     "userId" INTEGER NOT NULL,
-    "cpf" TEXT NOT NULL,
 
     CONSTRAINT "ceo_pkey" PRIMARY KEY ("userId")
 );
@@ -106,7 +106,7 @@ CREATE TABLE "loan" (
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ceo_cpf_key" ON "ceo"("cpf");
+CREATE UNIQUE INDEX "user_cpf_key" ON "user"("cpf");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "company_cnpj_key" ON "company"("cnpj");

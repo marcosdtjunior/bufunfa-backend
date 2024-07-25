@@ -10,24 +10,18 @@ const register = async (req: Request, res: Response) => {
     const user = req.body;
 
     try {
-        const { cpf, ...userData } = user;
-        const { email } = user;
+        const { cpf, email } = user;
 
-        if (userType === 'ceo') {
-            if (!cpf) {
-                return res.status(400).json({ mensagem: 'O CPF do CEO não foi informado' });
-            }
-
-            const findCPF = await findUnique('ceo', { cpf });
-            if (findCPF) {
-                return res.status(400).json({ mensagem: 'Já existe um CEO com o CPF cadastrado' });
-            }
-        }
-
-        const validation = requiredData.safeParse(userData);
+        const validation = requiredData.safeParse(user);
 
         if (!validation.success) {
             return res.status(400).json({ mensagem: validation.error.issues[0].message });
+        }
+
+        const findCPF = await findUnique('user', { cpf });
+
+        if (findCPF) {
+            return res.status(400).json({ mensagem: 'Já existe um usuário com o CPF cadastrado' });
         }
 
         const findEmail = await findUnique('user', { email });
@@ -39,18 +33,14 @@ const register = async (req: Request, res: Response) => {
         const encryptedPassword = await bcrypt.hash(user.password, 10);
 
         await createOrUpdate('user', {
-            ...userData,
+            ...user,
             password: encryptedPassword,
             type: userType
         });
 
         const userDataFound = await findUnique('user', { email });
 
-        if (userType === 'ceo') {
-            await createOrUpdate(userType, { userId: userDataFound.id, cpf });
-        } else {
-            await createOrUpdate(userType, { userId: userDataFound.id });
-        }
+        await createOrUpdate(userType, { userId: userDataFound.id });
 
         return res.status(201).json({ mensagem: "Usuário criado com sucesso!" });
     } catch (error) {
@@ -93,7 +83,18 @@ const login = async (req: Request, res: Response) => {
     }
 }
 
+const getUserInfo = async (req: Request, res: Response) => {
+
+    try {
+        return res.status(200).json(req.user);
+    }
+    catch (error) {
+        return res.status(500).json(error);
+    }
+}
+
 export {
     register,
-    login
+    login,
+    getUserInfo
 }

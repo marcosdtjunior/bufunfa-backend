@@ -14,6 +14,7 @@ model user {
   id                Int        @id @default(autoincrement())
   name              String
   email             String     @unique
+  cpf               String     @unique
   password          String
   photo             String?
   background        String?
@@ -25,7 +26,6 @@ model user {
 model ceo {
   user              user       @relation(fields: [userId], references: [id])
   userId            Int
-  cpf               String     @unique
   companies         company[]
   @@id(userId)
 }
