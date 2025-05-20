@@ -6,25 +6,31 @@ import { applyForLoan, showMandatoryExpenses, showOptionalExpenses } from './con
 
 const router = Router();
 
-router.post('/register/:userType', register);
-router.post('/login/:userType', login);
+function asyncHandler(fn: any) {
+    return (req: any, res: any, next: any) => {
+        Promise.resolve(fn(req, res, next)).catch(next);
+    };
+}
 
-router.use(verifyLogin);
+router.post('/register/:userType', asyncHandler(register));
+router.post('/login/:userType', asyncHandler(login));
 
-router.get('/userInfo', getUserInfo);
+router.use(asyncHandler(verifyLogin));
+
+router.get('/userInfo', asyncHandler(getUserInfo));
 
 //CEO routes
-router.post('/createCompany', createCompany);
-router.post('/createTask/:companyId', createTask);
-router.post('/createExpense/:companyId', createExpense);
-router.post('/hireEmployee/:companyId', hireEmployee);
-router.get('/getAllEmployees', getAllEmployees);
-router.get('/getCompanyEmployees/:companyId', getCompanyEmployees);
-router.get('/getCeoCompanies', getCeoCompanies);
+router.post('/createCompany', asyncHandler(createCompany));
+router.post('/createTask/:companyId', asyncHandler(createTask));
+router.post('/createExpense/:companyId', asyncHandler(createExpense));
+router.post('/hireEmployee/:companyId', asyncHandler(hireEmployee));
+router.get('/getAllEmployees', asyncHandler(getAllEmployees));
+router.get('/getCompanyEmployees/:companyId', asyncHandler(getCompanyEmployees));
+router.get('/getCeoCompanies', asyncHandler(getCeoCompanies));
 
 //Employee routes
-router.post('/applyForLoan', applyForLoan);
-router.get('/showMandatoryExpenses', showMandatoryExpenses);
-router.get('/showOptionalExpenses', showOptionalExpenses);
+router.post('/applyForLoan', asyncHandler(applyForLoan));
+router.get('/showMandatoryExpenses', asyncHandler(showMandatoryExpenses));
+router.get('/showOptionalExpenses', asyncHandler(showOptionalExpenses));
 
 export default router;
