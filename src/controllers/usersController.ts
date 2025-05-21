@@ -21,13 +21,13 @@ const register = async (req: Request, res: Response) => {
         const findCPF = await findUnique('user', { cpf });
 
         if (findCPF) {
-            return res.status(400).json({ mensagem: 'Já existe um usuário com o CPF cadastrado' });
+            return res.status(400).json({ mensagem: 'Já existe um usuário com este CPF' });
         }
 
         const findEmail = await findUnique('user', { email });
 
         if (findEmail) {
-            return res.status(404).json({ mensagem: 'Já existe um usuário com o e-mail cadastrado' });
+            return res.status(404).json({ mensagem: 'Já existe um usuário utilizando este e-mail' });
         }
 
         const encryptedPassword = await bcrypt.hash(user.password, 10);

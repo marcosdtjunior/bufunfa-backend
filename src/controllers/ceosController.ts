@@ -11,6 +11,12 @@ const createCompany = async (req: Request, res: Response) => {
             return res.status(401).json({ mensagem: 'Você não pode executar esta funcionalidade' });
         }
 
+        const findCNPJ = await findUnique('company', { cnpj: data.cnpj });
+
+        if (findCNPJ) {
+            return res.status(400).json({ mensagem: 'Já existe uma empresa com este CNPJ' });
+        }
+
         const ceo = await findUnique('user', { id: userId });
 
         await createOrUpdate('company', { ...data, ceoId: ceo.id });
