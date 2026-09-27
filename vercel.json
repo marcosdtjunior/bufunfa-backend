@@ -12,5 +12,5 @@
             "dest": "src/index.ts"
         }
     ],
-    "buildCommand": "npm run build && npm run dev"
+    "buildCommand": "npm install && npm run dev"
 }
