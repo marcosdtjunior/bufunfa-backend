@@ -9,7 +9,9 @@ app.use(cors());
 app.use(json());
 app.use(router);
 
-app.listen(process.env.PORT,
-    () => { console.log("Servidor executando na porta", process.env.PORT) });
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`Servidor local na porta ${PORT}`));
+}
 
 export default app;
