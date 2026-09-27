@@ -12,5 +12,10 @@
             "dest": "src/index.ts"
         }
     ],
-    "buildCommand": "npm install && npm run dev"
+    "buildCommand": "npm install && npm run dev",
+    "functions": {
+        "src/routes.ts": {
+            "includeFiles": "node_modules/.prisma/client/**/*"
+        }
+    }
 }
