@@ -1,7 +1,9 @@
 {
-    "functions": {
-        "src/index.ts": {
-            "includeFiles": "node_modules/.prisma/client/**/*"
+    "version": 2,
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "src/index.ts"
         }
-    }
+    ]
 }
