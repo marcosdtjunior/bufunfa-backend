@@ -11,3 +11,5 @@ app.use(router);
 
 app.listen(process.env.PORT,
     () => { console.log("Servidor executando na porta", process.env.PORT) });
+
+export default app;

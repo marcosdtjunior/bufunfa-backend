@@ -6,7 +6,8 @@ import { createOrUpdate, findUnique } from '../prismaFunctions/prisma';
 import requiredData from '../utils/validations';
 
 const register = async (req: Request, res: Response) => {
-    const { userType } = req.params;
+    const userTypeParam = req.params.userType;
+    const userType = Array.isArray(userTypeParam) ? userTypeParam[0] : userTypeParam;
     const user = req.body;
 
     try {
