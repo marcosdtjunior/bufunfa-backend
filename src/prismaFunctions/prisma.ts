@@ -1,6 +1,6 @@
 import { number } from "zod";
 
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require("../../prisma/generated/client");
 
 export const prisma = new PrismaClient();
 
